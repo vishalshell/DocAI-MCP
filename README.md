@@ -1,66 +1,163 @@
 # DocAI-MCP (Ollama Local LLM Edition)
 
-A **private, modular, fully local GenAI document analysis tool** using the Model Context Protocol (MCP) with Agent-to-Agent (A2A) orchestration and **Ollama-hosted Mistral LLM** for all AI tasks.
-No cloud API calls, no external data leakage. 100% private—runs on your GPU/CPU.
+> Modular, fully local document analysis and Q&A powered by Model Context Protocol (MCP) and Agent-to-Agent (A2A) orchestration.  
+> All AI runs on your own hardware using [Ollama](https://ollama.com/) and the Mistral large language model.
 
-## 🚀 Features
+---
 
-- **Summarize PDF, DOCX, TXT:** Upload docs and get summaries using Mistral via Ollama.
-- **Ask Questions:** Interactive Q&A on document content.
-- **Translate Summaries:** Uses LLM prompts for translation, no external API.
-- **Everything Local:** All model inference is on your server. No OpenAI, Google, or HuggingFace required.
-- **Agentic (MCP/A2A) Orchestration:** Each function is a swappable agent.
-- **Gradio UI:** Clean, web-based, no login.
+## 🚀 What is DocAI-MCP?
 
-## 🏗️ Project Structure
+- **Upload a PDF, DOCX, or TXT file** – get an instant summary, ask questions, or translate summaries.
+- **Private by default:** All processing happens locally—no cloud, no external API calls, no data leaves your machine.
+- **Composable Agent Architecture (MCP, A2A):** Specialized “agents” for summarization, Q&A, and translation, working together with explicit, auditable messaging.
+- **No API keys or subscriptions required.**
+- **Simple, browser-based Gradio UI.**
 
-    docai-mcp/
-    ├── app.py
-    ├── agents/
-    │   ├── summarizer.py
-    │   ├── qna.py
-    │   └── translator.py
-    ├── protocols/
-    │   └── mcp.py
-    ├── utils/
-    │   ├── loader.py
-    │   └── config.py
-    ├── requirements.txt
-    ├── LICENSE
-    └── README.md
+---
 
-## ⚡ Getting Started
+## ⚡ Quick Start
 
-### 1. **Install [Ollama](https://ollama.com/download)**
+### 1. Install Ollama
 
-- Install Ollama and run:
-    ollama pull mistral
-    ollama serve
+Ollama lets you run open-source large language models like Mistral on your PC, Mac, Linux server, or WSL.
 
-### 2. **Install dependencies**
+#### Linux / WSL
 
-    pip install -r requirements.txt
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+````
 
-### 3. **Run the app**
+#### MacOS
 
-    python app.py
+```bash
+brew install ollama
+```
 
-- App runs at `http://localhost:7860`
-- Upload your doc, summarize, ask questions, translate—all on your local hardware.
+#### Windows
 
-## 🔄 Troubleshooting
+Ollama runs under [WSL2](https://learn.microsoft.com/en-us/windows/wsl/).
+See [Ollama Windows setup](https://ollama.com/download) for instructions.
 
-- **Ollama must be running** locally (`http://localhost:11434`) and the model pulled (`mistral`).
-- **Translation is prompt-based and not as accurate as specialized APIs.** For perfect translation, consider augmenting with external APIs if privacy allows.
+*For full details or troubleshooting, see the [Ollama documentation](https://ollama.com/download).*
 
-## 📜 License
+---
 
-MIT License
+### 2. Download the Mistral Model
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-IN THE SOFTWARE.
+After installing Ollama, run:
+
+```bash
+ollama pull mistral
+```
+
+This will download the Mistral model (\~4GB). You can swap for any Ollama-compatible model (see below).
+
+---
+
+### 3. Start the Ollama Server
+
+```bash
+ollama serve
+```
+
+By default, Ollama will serve its API at `http://localhost:11434`.
+
+> **Tip:** You can run Ollama as a background service or leave the terminal open.
+
+---
+
+### 4. Clone and Run DocAI-MCP
+
+```bash
+git clone https://github.com/vishalshell/DocAI-MCP.git
+cd DocAI-MCP
+pip install -r requirements.txt
+python app.py
+```
+
+Open your browser to [http://localhost:7860](http://localhost:7860).
+
+* Upload a document, get a summary, ask questions, and translate—all without sending data to the cloud!
+
+---
+
+## 🏗️ Folder Structure
+
+```
+DocAI-MCP/
+├── app.py
+├── agents/
+│   ├── summarizer.py
+│   ├── qna.py
+│   └── translator.py
+├── protocols/
+│   └── mcp.py
+├── utils/
+│   ├── loader.py
+│   └── config.py
+├── requirements.txt
+├── LICENSE
+├── README.md
+└── WIKI.md
+```
+
+---
+
+## 🤖 FAQ
+
+**How private is this?**
+100% private: your files and queries never leave your machine.
+
+**What is MCP and A2A?**
+See [WIKI.md](./WIKI.md) for details.
+In short: Each function (summary, Q\&A, translation) is handled by a dedicated “agent” via formal, traceable messages. This makes the system modular, extensible, and easy to audit or extend.
+
+**Can I use a different model?**
+Yes!
+Replace `"mistral"` with your preferred model (e.g., `"llama2"`, `"mixtral"`) in `agents/summarizer.py`, `agents/qna.py`, and `agents/translator.py`.
+Just run `ollama pull MODELNAME` first.
+
+**Is translation as good as Google Translate?**
+No—prompt-based LLM translation is often good enough for casual/business use, but less accurate than a specialized API. For legal or medical translation, use dedicated tools.
+
+**How fast is this?**
+Depends on your hardware. On a modern GPU, Mistral can answer in seconds; on CPU, it’s slower.
+
+---
+
+## 🧰 Troubleshooting
+
+* “Connection refused” – Is `ollama serve` running? Did you download (`ollama pull mistral`)?
+* For very large files, only the first \~3000 characters are used per request (adjustable in the code).
+* Some PDF/DOCX files with heavy formatting, images, or tables may not extract all text. For best results, use clear, text-rich documents.
+
+---
+
+## 🔐 Security and License
+
+**MIT License** – see [LICENSE](./LICENSE)
+
+**NO WARRANTY OR GUARANTEE OF ANY KIND.**
+You are responsible for your own use, data, and results.
+
+---
+
+## 📝 Extending This Project
+
+* Swap LLMs, add speech-to-text, OCR, or image agents.
+* See [WIKI.md](./WIKI.md) for best practices, architectural explanations, and more.
+
+---
+
+## 🤝 Credits
+
+* [Ollama](https://ollama.com/) for local LLM infrastructure
+* [Mistral](https://ollama.com/library/mistral) for the LLM
+* [Gradio](https://gradio.app/) for the UI
+
+---
+
+## 📚 More Info
+
+* Full architecture, agent details, extensibility, and advanced usage in [WIKI.md](./WIKI.md)
+* [Open an issue](https://github.com/vishalshell/DocAI-MCP/issues) for support or feature requests.
