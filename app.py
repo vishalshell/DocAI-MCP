@@ -34,8 +34,8 @@ def translate_summary(target_lang):
     result = dispatch(msg)
     return result["translated_text"]
 
-with gr.Blocks(title="DocAI-MCP Orchestrator") as demo:
-    gr.Markdown("# DocAI MCP: Document Summarizer & Agentic QnA")
+with gr.Blocks(title="DocAI-MCP Orchestrator (Ollama)") as demo:
+    gr.Markdown("# DocAI MCP: Document Summarizer & Agentic QnA (Ollama Local LLM)")
     with gr.Row():
         file = gr.File(label="Upload Document (PDF, DOCX, TXT)")
         summary_btn = gr.Button("Summarize")
